@@ -9,21 +9,83 @@ class HalamanKeranjang extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Halaman Keranjang"),
+        title: Text(
+          "Halaman Keranjang",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 29, 216, 160),
+        backgroundColor: Colors.teal,
+        foregroundColor: Colors.white,
       ),
+
       body: Consumer<Keranjang>(
         builder: (context, value, child) {
+
           if (value.items.isEmpty) {
-            return Text("Keranjang Masih Kosong");
+            return Center(
+              child: Text(
+                "Keranjang masih kosong",
+                style: TextStyle(fontSize: 18),
+              ),
+            );
           }
-          //kalo ada data
+
           return ListView.builder(
             itemCount: value.items.length,
             itemBuilder: (context, index) {
+              final product = value.items[index];
+
               return Card(
-                child: Text(value.items[index].nama),
+                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(
+                        product.gambarUrl,
+                        width: 65,
+                        height: 65,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 65,
+                            height: 65,
+                            color: Colors.grey.shade300,
+                            child: Icon(Icons.image_not_supported),
+                          );
+                        },
+                      ),
+                    ),
+
+                    title: Text(
+                      product.nama,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        final namaItem = product.nama;
+
+                        value.remove(product);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("$namaItem dihapus dari keranjang"),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
               );
             },
           );
